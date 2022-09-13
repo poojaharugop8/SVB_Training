@@ -1,0 +1,14 @@
+.form-label {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-component {
+  display: flex;
+  justify-content: flex-end;
+  margin: 30px 0px 30px 30px;
+}
+
+.main-component {
+  margin: 10px 100px;
+}

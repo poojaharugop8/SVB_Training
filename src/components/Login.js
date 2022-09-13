@@ -2,17 +2,18 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import validator from 'validator'
+import validator from 'validator';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = ({ isLogged, setIsLogged }) => {
   const history = useNavigate();
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
 
   var user = {};
   const handleClick = () => {
+    setIsLogged(true);
     if (user.email && user.password) {
       console.log('User entered ', user);
 
@@ -23,8 +24,10 @@ const Login = () => {
       })
         .then((response) => {
           console.log('Response from API is', response);
+          console.log('Header Authorization', response.headers.authorization);
+          localStorage.setItem('token', response.headers.authorization);
           setMessage(response.data.message);
-          history('/');
+          history('/profile');
         })
         .catch((error) => {
           console.log('error from API is', error);
@@ -37,10 +40,10 @@ const Login = () => {
   const getEmail = (event) => {
     user.email = event.target.value;
     if (!validator.isEmail(user.email)) {
-      setError('Enter valid Email!')
+      setError('Enter valid Email!');
       console.log('User entered ', event.target.value);
     } else {
-      setError(null)
+      setError(null);
     }
     console.log('User entered ', event.target.value);
   };
@@ -49,37 +52,48 @@ const Login = () => {
     user.password = event.target.value;
   };
   return (
-    <div className='container'>
-      <div className='col' style={{ textAlign: 'center' }}>
-        <h1>Login Component</h1>
-        <div className='form-group'>
-          <label>Email</label>
-          <input type="email" onChange={getEmail} className='form-control' required />
-        </div>
-        <div className='form-group'>
-          <label>Password</label>
-          <input
-            type='password'
-            onChange={getPassword}
-            className='form-control'
-          />
-        </div>
-        {message ? (
-          <div className='alert alert-success'>{message}</div>
-        ) : error ? (
-          <div className='alert alert-danger'>{error}</div>
-        ) : (
-          ''
-        )}
-        <button type='submit' onClick={handleClick} className='btn btn-primary'>
-          Submit
-        </button>
-        <div className='linkToLogin'>
-          <Link to='/forgotPassword'>Forgot Your Password?</Link>
-          <Link to='/signup'>New User ?</Link>
+    !isLogged && (
+      <div className='container'>
+        <div className='col' style={{ textAlign: 'center' }}>
+          <h1>Login Component</h1>
+          <div className='form-group'>
+            <label>Email</label>
+            <input
+              type='email'
+              onChange={getEmail}
+              className='form-control'
+              required
+            />
+          </div>
+          <div className='form-group'>
+            <label>Password</label>
+            <input
+              type='password'
+              onChange={getPassword}
+              className='form-control'
+            />
+          </div>
+          {message ? (
+            <div className='alert alert-success'>{message}</div>
+          ) : error ? (
+            <div className='alert alert-danger'>{error}</div>
+          ) : (
+            ''
+          )}
+          <button
+            type='submit'
+            onClick={handleClick}
+            className='btn btn-primary'
+          >
+            Submit
+          </button>
+          <div className='linkToLogin'>
+            <Link to='/forgotPassword'>Forgot Your Password?</Link>
+            <Link to='/signup'>New User ?</Link>
+          </div>
         </div>
       </div>
-    </div>
+    )
   );
 };
 
